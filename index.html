@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HabitGenius · Hábitos y Gastos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">🧠</span>
+      <span class="brand-name">HabitGenius</span>
+    </div>
+
+    <div class="level-box">
+      <div class="level-badge" id="levelBadge">Nv. 1</div>
+      <div class="level-info">
+        <span id="pointsLabel">0 pts</span>
+        <div class="level-bar"><div class="level-bar-fill" id="levelBarFill"></div></div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-btn active" data-view="dashboard">📊 Dashboard</button>
+      <button class="nav-btn" data-view="habits">✅ Hábitos</button>
+      <button class="nav-btn" data-view="expenses">💰 Gastos</button>
+      <button class="nav-btn" data-view="badges">🏅 Insignias</button>
+      <button class="nav-btn" data-view="settings">⚙️ Datos</button>
+    </nav>
+    <div class="sidebar-footer">
+      <label class="switch">
+        <input type="checkbox" id="themeToggle">
+        <span>Modo oscuro</span>
+      </label>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view active">
+      <header class="view-header">
+        <h1>Dashboard</h1>
+        <p class="subtitle" id="todayLabel"></p>
+      </header>
+
+      <div class="mascot-card" id="mascotCard">
+        <span class="mascot-emoji" id="mascotEmoji">🐼</span>
+        <p class="mascot-text" id="mascotText"></p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card stat-card grad-1">
+          <span class="stat-label">Gasto de hoy</span>
+          <span class="stat-value" id="statToday">$0</span>
+        </div>
+        <div class="card stat-card grad-2">
+          <span class="stat-label">Gasto del mes</span>
+          <span class="stat-value" id="statMonth">$0</span>
+        </div>
+        <div class="card stat-card grad-3">
+          <span class="stat-label">Hábitos activos</span>
+          <span class="stat-value" id="statHabits">0</span>
+        </div>
+        <div class="card stat-card grad-4">
+          <span class="stat-label">Racha más larga</span>
+          <span class="stat-value" id="statStreak">0 🔥</span>
+        </div>
+      </div>
+
+      <div class="cards-grid two-col">
+        <div class="card">
+          <h2>💸 Gastos por categoría (mes actual)</h2>
+          <div id="categoryChart" class="bar-chart"></div>
+        </div>
+        <div class="card">
+          <h2>✅ Hábitos de hoy</h2>
+          <ul id="dashboardHabitList" class="simple-list"></ul>
+        </div>
+      </div>
+
+      <div class="card" id="budgetSummaryCard" style="display:none">
+        <h2>🎯 Presupuestos del mes</h2>
+        <div id="budgetSummary" class="budget-list"></div>
+      </div>
+    </section>
+
+    <!-- HABITS -->
+    <section id="view-habits" class="view">
+      <header class="view-header">
+        <h1>Hábitos</h1>
+        <button class="btn primary" id="openHabitModal">+ Nuevo hábito</button>
+      </header>
+
+      <div class="habit-cards" id="habitCards"></div>
+      <p class="empty-msg" id="habitsEmptyMsg" style="display:none">Aún no tienes hábitos. Crea el primero y empieza a ganar puntos ✨</p>
+    </section>
+
+    <!-- EXPENSES -->
+    <section id="view-expenses" class="view">
+      <header class="view-header">
+        <h1>Gastos</h1>
+        <button class="btn primary" id="openExpenseModal">+ Nuevo gasto</button>
+      </header>
+
+      <div class="card filters-bar">
+        <div class="filter-group">
+          <label>Ver por</label>
+          <select id="filterMode">
+            <option value="month">Mes</option>
+            <option value="day">Día</option>
+            <option value="all">Todo</option>
+          </select>
+        </div>
+        <div class="filter-group" id="filterMonthGroup">
+          <label>Mes</label>
+          <input type="month" id="filterMonth">
+        </div>
+        <div class="filter-group" id="filterDayGroup" style="display:none">
+          <label>Día</label>
+          <input type="date" id="filterDay">
+        </div>
+        <div class="filter-group">
+          <label>Categoría</label>
+          <select id="filterCategory">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="filter-total">
+          Total filtrado: <strong id="filterTotal">$0</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🎯 Presupuestos por categoría</h2>
+        <p class="hint">Define un límite mensual para recibir una alerta visual cuando te acerques o te pases.</p>
+        <div class="budget-editor" id="budgetEditor"></div>
+        <div class="budget-add">
+          <input type="text" id="budgetCategory" list="categoryList" placeholder="Categoría">
+          <input type="number" id="budgetAmount" min="0" step="1000" placeholder="Límite mensual">
+          <button class="btn" id="addBudgetBtn">Guardar límite</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <table class="expense-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Descripción</th>
+              <th>Categoría</th>
+              <th>Monto</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="expenseTableBody"></tbody>
+        </table>
+        <p class="empty-msg" id="expensesEmptyMsg" style="display:none">No hay gastos para este filtro.</p>
+      </div>
+    </section>
+
+    <!-- BADGES -->
+    <section id="view-badges" class="view">
+      <header class="view-header">
+        <h1>Insignias</h1>
+        <p class="subtitle">Desbloquea logros usando la app todos los días</p>
+      </header>
+      <div class="badges-grid" id="badgesGrid"></div>
+    </section>
+
+    <!-- SETTINGS / DATA -->
+    <section id="view-settings" class="view">
+      <header class="view-header">
+        <h1>Datos</h1>
+      </header>
+      <div class="card">
+        <p>Todo tu progreso se guarda automáticamente en este navegador (localStorage). Desde aquí puedes exportar una copia de seguridad o importarla en otro equipo.</p>
+        <div class="settings-actions">
+          <button class="btn" id="exportBtn">⬇️ Exportar datos (JSON)</button>
+          <label class="btn file-btn">
+            ⬆️ Importar datos (JSON)
+            <input type="file" id="importInput" accept="application/json" hidden>
+          </label>
+          <button class="btn danger" id="resetBtn">🗑️ Borrar todos los datos</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL: nuevo hábito -->
+<div class="modal-backdrop" id="habitModal">
+  <div class="modal">
+    <h2>Nuevo hábito</h2>
+    <form id="habitForm">
+      <label>Nombre del hábito</label>
+      <input type="text" id="habitName" placeholder="Ej: Leer 20 minutos" required>
+      <label>Ícono</label>
+      <div class="icon-picker" id="iconPicker"></div>
+      <input type="hidden" id="habitIcon" value="🎯">
+      <label>Frecuencia objetivo</label>
+      <select id="habitFrequency">
+        <option value="daily">Todos los días</option>
+        <option value="weekdays">Días de semana</option>
+      </select>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-close="habitModal">Cancelar</button>
+        <button type="submit" class="btn primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: nuevo gasto -->
+<div class="modal-backdrop" id="expenseModal">
+  <div class="modal">
+    <h2>Nuevo gasto</h2>
+    <form id="expenseForm">
+      <label>Descripción</label>
+      <input type="text" id="expenseDesc" placeholder="Ej: Mercado" required>
+      <label>Monto</label>
+      <input type="number" id="expenseAmount" min="0" step="0.01" placeholder="0.00" required>
+      <label>Categoría</label>
+      <input type="text" id="expenseCategory" list="categoryList" placeholder="Ej: Comida" required>
+      <datalist id="categoryList"></datalist>
+      <label>Fecha</label>
+      <input type="date" id="expenseDate" required>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-close="expenseModal">Cancelar</button>
+        <button type="submit" class="btn primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: calendario mensual de un hábito -->
+<div class="modal-backdrop" id="calendarModal">
+  <div class="modal calendar-modal">
+    <div class="calendar-header">
+      <button class="btn" id="calPrevMonth">←</button>
+      <h2 id="calendarTitle">Hábito</h2>
+      <button class="btn" id="calNextMonth">→</button>
+    </div>
+    <div class="calendar-weekdays">
+      <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
+    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn primary" data-close="calendarModal">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div id="confettiLayer"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/habits.js"></script>
+<script src="js/expenses.js"></script>
+<script src="js/budgets.js"></script>
+<script src="js/gamification.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
